@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="action_chat_ai_bridge" model="ir.actions.act_url">
+        <field name="name">Chat AI</field>
+        <field name="url">/chat_ai_bridge</field>
+        <field name="target">self</field>
+    </record>
+
+    <menuitem
+        id="menu_chat_ai_bridge_root"
+        name="Chat AI"
+        sequence="100"
+        action="action_chat_ai_bridge"
+    />
+</odoo>

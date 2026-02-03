@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_chat_ai" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.chat.ai</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='settings']" position="inside">
+                <div class="app_settings_block" data-string="Chat AI" string="Chat AI">
+                    <h2>Chat AI</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane" />
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Chat AI API Base URL</span>
+                                <div class="text-muted">Example: https://your-ai-service.example.com</div>
+                                <field name="chat_ai_api_base_url" placeholder="https://your-ai-service.example.com" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane" />
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Chat AI API Key</span>
+                                <div class="text-muted">Optional bearer token for the AI service.</div>
+                                <field name="chat_ai_api_key" password="True" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane" />
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Default Model</span>
+                                <div class="text-muted">Leave blank to use the AI service default.</div>
+                                <field name="chat_ai_default_model" placeholder="openai:gpt-4o-mini" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane" />
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Smart SQL Generation</span>
+                                <div class="text-muted">Use template-aware SQL generation when available.</div>
+                                <field name="chat_ai_use_smart_generation" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
