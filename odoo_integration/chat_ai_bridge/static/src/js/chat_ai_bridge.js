@@ -1,16 +1,11 @@
 /** @odoo-module **/
 
-const callChatAI = async (prompt) => {
-    const response = await fetch("/chat_ai_bridge/ask", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-Requested-With": "XMLHttpRequest",
-        },
-        body: JSON.stringify({ prompt }),
+import { rpc } from "@web/core/network/rpc_service";
+
+const callChatAI = (prompt) =>
+    rpc("/chat_ai_bridge/ask", {
+        prompt,
     });
-    return response.json();
-};
 
 const setupChatAIPage = () => {
     const container = document.querySelector(".o_chat_ai_bridge");

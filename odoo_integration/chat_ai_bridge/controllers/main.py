@@ -38,7 +38,10 @@ class ChatAIBridgeController(http.Controller):
         try:
             response = requests.post(url, json=payload, headers=headers, timeout=60)
             response.raise_for_status()
+            data = response.json()
         except requests.RequestException as exc:
             return {"error": f"Chat AI request failed: {exc}"}
+        except ValueError:
+            return {"error": "Chat AI request failed: invalid JSON response."}
 
-        return {"data": response.json()}
+        return {"data": data}
