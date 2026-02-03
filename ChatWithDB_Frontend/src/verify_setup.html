@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Verification - LLMonDBPGAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #cbd5e0;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .test-item.checking {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+        
+        .test-item.success {
+            border-left-color: #10b981;
+            background: #ecfdf5;
+        }
+        
+        .test-item.error {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+        
+        .test-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .test-status {
+            font-size: 24px;
+        }
+        
+        .test-message {
+            font-size: 0.9em;
+            color: #4a5568;
+            margin-top: 5px;
+        }
+        
+        .button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        
+        .button:hover {
+            background: #5a67d8;
+        }
+        
+        .button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        .summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: #edf2f7;
+            border-radius: 8px;
+        }
+        
+        .summary h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #718096;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+        }
+        
+        .btn-secondary {
+            background: #48bb78;
+        }
+        
+        .btn-danger {
+            background: #f56565;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Setup Verification</h1>
+        <p class="subtitle">Testing Frontend-Backend Connection</p>
+        
+        <div id="tests">
+            <div class="test-item" id="test-config">
+                <div>
+                    <div class="test-name">Configuration Loaded</div>
+                    <div class="test-message">Checking if config.js is loaded...</div>
+                </div>
+                <div class="test-status">⏳</div>
+            </div>
+            
+            <div class="test-item" id="test-backend">
+                <div>
+                    <div class="test-name">Backend Connection</div>
+                    <div class="test-message">Testing connection to backend API...</div>
+                </div>
+                <div class="test-status">⏳</div>
+            </div>
+            
+            <div class="test-item" id="test-health">
+                <div>
+                    <div class="test-name">API Health Check</div>
+                    <div class="test-message">Verifying API health endpoint...</div>
+                </div>
+                <div class="test-status">⏳</div>
+            </div>
+            
+            <div class="test-item" id="test-databases">
+                <div>
+                    <div class="test-name">Database Endpoint</div>
+                    <div class="test-message">Testing database listing...</div>
+                </div>
+                <div class="test-status">⏳</div>
+            </div>
+            
+            <div class="test-item" id="test-models">
+                <div>
+                    <div class="test-name">Models Endpoint</div>
+                    <div class="test-message">Testing model provider endpoints...</div>
+                </div>
+                <div class="test-status">⏳</div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="button btn-primary" onclick="runTests()">▶️ Run Tests</button>
+            <button class="button btn-secondary" onclick="location.href='index.html'">🏠 Go to Main App</button>
+        </div>
+        
+        <div class="summary" id="summary" style="display: none;">
+            <h2>📊 Test Results</h2>
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="passed-count">0</div>
+                    <div class="stat-label">Passed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="failed-count">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-count">5</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+            <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 6px;">
+                <div id="summary-message"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/config.js"></script>
+    <script>
+        const API_BASE = window.API_CONFIG?.BASE_URL || 'http://localhost:8000';
+        
+        let testResults = {
+            passed: 0,
+            failed: 0,
+            total: 5
+        };
+        
+        async function runTests() {
+            // Reset
+            testResults = { passed: 0, failed: 0, total: 5 };
+            document.getElementById('summary').style.display = 'none';
+            
+            // Reset all tests
+            ['config', 'backend', 'health', 'databases', 'models'].forEach(test => {
+                const elem = document.getElementById(`test-${test}`);
+                elem.className = 'test-item checking';
+                elem.querySelector('.test-status').textContent = '⏳';
+            });
+            
+            // Test 1: Config loaded
+            await testConfig();
+            await sleep(500);
+            
+            // Test 2: Backend reachable
+            await testBackend();
+            await sleep(500);
+            
+            // Test 3: Health endpoint
+            await testHealth();
+            await sleep(500);
+            
+            // Test 4: Databases endpoint
+            await testDatabases();
+            await sleep(500);
+            
+            // Test 5: Models endpoint
+            await testModels();
+            
+            // Show summary
+            showSummary();
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        async function testConfig() {
+            const elem = document.getElementById('test-config');
+            const message = elem.querySelector('.test-message');
+            const status = elem.querySelector('.test-status');
+            
+            if (window.API_CONFIG && window.API_CONFIG.BASE_URL) {
+                elem.className = 'test-item success';
+                status.textContent = '✅';
+                message.textContent = `Config loaded: ${window.API_CONFIG.BASE_URL}`;
+                testResults.passed++;
+            } else {
+                elem.className = 'test-item error';
+                status.textContent = '❌';
+                message.textContent = 'Config not found. Check if config.js is loaded.';
+                testResults.failed++;
+            }
+        }
+        
+        async function testBackend() {
+            const elem = document.getElementById('test-backend');
+            const message = elem.querySelector('.test-message');
+            const status = elem.querySelector('.test-status');
+            
+            try {
+                const response = await fetch(`${API_BASE}/docs`, { method: 'HEAD' });
+                if (response.ok || response.status === 200 || response.status === 404) {
+                    elem.className = 'test-item success';
+                    status.textContent = '✅';
+                    message.textContent = `Backend reachable at ${API_BASE}`;
+                    testResults.passed++;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                elem.className = 'test-item error';
+                status.textContent = '❌';
+                message.textContent = `Cannot reach backend: ${error.message}`;
+                testResults.failed++;
+            }
+        }
+        
+        async function testHealth() {
+            const elem = document.getElementById('test-health');
+            const message = elem.querySelector('.test-message');
+            const status = elem.querySelector('.test-status');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                
+                if (response.ok && data.status) {
+                    elem.className = 'test-item success';
+                    status.textContent = '✅';
+                    message.textContent = `Health check passed: ${data.status}`;
+                    testResults.passed++;
+                } else {
+                    throw new Error('Invalid response');
+                }
+            } catch (error) {
+                elem.className = 'test-item error';
+                status.textContent = '❌';
+                message.textContent = `Health check failed: ${error.message}`;
+                testResults.failed++;
+            }
+        }
+        
+        async function testDatabases() {
+            const elem = document.getElementById('test-databases');
+            const message = elem.querySelector('.test-message');
+            const status = elem.querySelector('.test-status');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/databases`);
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    elem.className = 'test-item success';
+                    status.textContent = '✅';
+                    message.textContent = `Found ${data.databases.length} database(s)`;
+                    testResults.passed++;
+                } else {
+                    throw new Error(data.detail || 'Invalid response');
+                }
+            } catch (error) {
+                elem.className = 'test-item error';
+                status.textContent = '❌';
+                message.textContent = `Database endpoint failed: ${error.message}`;
+                testResults.failed++;
+            }
+        }
+        
+        async function testModels() {
+            const elem = document.getElementById('test-models');
+            const message = elem.querySelector('.test-message');
+            const status = elem.querySelector('.test-status');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/models/openai`);
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    elem.className = 'test-item success';
+                    status.textContent = '✅';
+                    message.textContent = `Models endpoint working: ${data.models.length} models available`;
+                    testResults.passed++;
+                } else {
+                    throw new Error(data.detail || 'Invalid response');
+                }
+            } catch (error) {
+                elem.className = 'test-item error';
+                status.textContent = '❌';
+                message.textContent = `Models endpoint failed: ${error.message}`;
+                testResults.failed++;
+            }
+        }
+        
+        function showSummary() {
+            const summary = document.getElementById('summary');
+            const messageDiv = document.getElementById('summary-message');
+            
+            document.getElementById('passed-count').textContent = testResults.passed;
+            document.getElementById('failed-count').textContent = testResults.failed;
+            
+            let message = '';
+            if (testResults.failed === 0) {
+                message = '<div style="color: #10b981; font-weight: 600;">🎉 All tests passed! Your setup is working correctly.</div>';
+                message += '<div style="margin-top: 10px; color: #4a5568;">You can now use the main application.</div>';
+            } else if (testResults.passed >= 3) {
+                message = '<div style="color: #f59e0b; font-weight: 600;">⚠️ Some tests failed, but core functionality may still work.</div>';
+                message += '<div style="margin-top: 10px; color: #4a5568;">Check the failed tests and review the QUICKSTART.md guide.</div>';
+            } else {
+                message = '<div style="color: #ef4444; font-weight: 600;">❌ Multiple tests failed. Please check your setup.</div>';
+                message += '<div style="margin-top: 10px; color: #4a5568;">1. Ensure backend is running on ' + API_BASE + '</div>';
+                message += '<div style="color: #4a5568;">2. Check backend terminal for errors</div>';
+                message += '<div style="color: #4a5568;">3. Verify .env configuration</div>';
+                message += '<div style="color: #4a5568;">4. Review QUICKSTART.md for setup instructions</div>';
+            }
+            
+            messageDiv.innerHTML = message;
+            summary.style.display = 'block';
+        }
+        
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            setTimeout(runTests, 500);
+        });
+    </script>
+</body>
+</html>

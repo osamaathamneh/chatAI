@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semantic Search - Natural Language to SQL</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content" style="justify-content: center; flex-direction: column;">
+                <div style="text-align: center;">
+                    <h1>🔍 Semantic Search</h1>
+                    <p class="subtitle">Semantic Search Over Database using LLM</p>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <a href="fast_chat.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <span class="icon">⚡</span>
+                        Fast Chat
+                    </a>
+                    <a href="evaluation.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <span class="icon">📊</span>
+                        Model Evaluation
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="card">
+                <div class="input-section">
+                    <label for="query">Ask a question about your database:</label>
+                    <textarea 
+                        id="query" 
+                        placeholder="e.g., Which games generate the most revenue?"
+                        rows="3"
+                    ></textarea>
+                    
+                    <!-- SQL Generation Options -->
+                    <div class="options-section">
+                        <div class="option-group">
+                            <label for="providerSelect">🌐 Provider:</label>
+                            <select id="providerSelect" class="select-input">
+                                <option value="openai">Online (OpenAI)</option>
+                                <option value="openrouter">OpenRouter (Multi-Model)</option>
+                                <option value="ollama">Offline (Ollama)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="option-group">
+                            <label for="modelSelect">🤖 Model:</label>
+                            <select id="modelSelect" class="select-input">
+                                <option value="openai:gpt-5">GPT-5</option>
+                            </select>
+                        </div>
+                        
+                        <div class="option-group">
+                            <label for="databaseSelect">💾 Database:</label>
+                            <select id="databaseSelect" class="select-input">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="option-group">
+                            <label for="catalogSelect">📚 Catalog:</label>
+                            <select id="catalogSelect" class="select-input">
+                                <option value="salespoint_production">salespoint_production</option>
+                            </select>
+                        </div>
+                        
+                        <div class="option-group">
+                            <label for="requestLimit">🔢 Request Limit:</label>
+                            <input type="number" id="requestLimit" class="number-input" value="5" min="1" max="50">
+                        </div>
+                        
+                        <div class="option-group">
+                            <label for="iterationLimit">🔄 Iteration Limit:</label>
+                            <input type="number" id="iterationLimit" class="number-input" value="5" min="1" max="50">
+                        </div>
+                        
+                        <div class="option-group">
+                            <label for="temperature">🌡️ Temperature:</label>
+                            <input type="number" id="temperature" class="number-input" value="0.3" min="0" max="2" step="0.1">
+                        </div>
+                        
+                        <div class="option-group">
+                            <label for="searchLimit">📊 Search Results:</label>
+                            <input type="number" id="searchLimit" class="number-input" value="10" min="1" max="50">
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="searchBtn" class="btn btn-secondary">
+                            <span class="icon">🔍</span>
+                            Semantic Search
+                        </button>
+                        <button id="generateBtn" class="btn btn-primary">
+                            <span class="icon">✨</span>
+                            Generate SQL
+                        </button>
+                    </div>
+                </div>
+
+                <div id="loading" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p id="loadingMessage">Processing your request...</p>
+                </div>
+
+                <!-- Search Results Section -->
+                <div id="searchResults" class="results-section hidden">
+                    <h3>📋 Semantic Search Results</h3>
+                    <div id="searchContent" class="search-results"></div>
+                </div>
+
+                <!-- SQL Results Section -->
+                <div id="sqlResults" class="results-section hidden">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3>💻 Generated SQL Query</h3>
+                        <button id="clearSqlBtn" class="btn btn-small btn-danger">
+                            <span class="icon">🗑️</span>
+                            Clear
+                        </button>
+                    </div>
+                    <div class="sql-container">
+                        <pre id="sqlQuery" class="sql-query"></pre>
+                        <button id="copyBtn" class="btn btn-small btn-copy">
+                            <span class="icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="executeBtn" class="btn btn-success">
+                            <span class="icon">▶️</span>
+                            Execute Query
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Query Execution Results -->
+                <div id="executionResults" class="results-section hidden">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3>📊 Query Results</h3>
+                        <button id="clearExecutionBtn" class="btn btn-small btn-danger">
+                            <span class="icon">🗑️</span>
+                            Clear
+                        </button>
+                    </div>
+                    <div id="queryResultsContent"></div>
+                </div>
+            </div>
+
+            <!-- Query History Section -->
+            <div class="history-section card">
+                <div class="history-header">
+                    <h3>📊 Query History</h3>
+                    <div class="history-actions">
+                        <button id="refreshHistoryBtn" class="btn btn-small">🔄 Refresh</button>
+                        <button id="clearHistoryBtn" class="btn btn-small btn-danger">🗑️ Clear All</button>
+                    </div>
+                </div>
+                <div id="historyList" class="history-list">
+                    <p class="text-secondary">No query history yet. Generate some SQL to see history!</p>
+                </div>
+            </div>
+
+            <!-- Examples Section -->
+            <div class="examples-section">
+                <h3>💡 Example Questions <span id="examplesSource" class="text-secondary" style="font-size: 0.8em;"></span></h3>
+                <div id="examplesGrid" class="examples-grid">
+                    <div class="example-card" onclick="setQuery(this.textContent)">
+                        Which games generate the most revenue?
+                    </div>
+                    <div class="example-card" onclick="setQuery(this.textContent)">
+                        List the total number of new cards sold and the total number of cards revalued for each location in 2023.
+                    </div>
+                    <div class="example-card" onclick="setQuery(this.textContent)">
+                        What is the average number of new cards sold on days where the visitor count was greater than 500 in 2024?
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Semantic Search • LLM-powered </p>
+        </footer>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/script.js?v=3"></script>
+</body>
+</html>

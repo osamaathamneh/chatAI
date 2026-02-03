@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Evaluation - SQL Generation</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content" style="justify-content: center; flex-direction: column;">
+                <div style="text-align: center;">
+                    <h1>📊 Model Evaluation</h1>
+                    <p class="subtitle">Compare SQL Generation Models</p>
+                </div>
+                <div>
+                    <a href="index.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <span class="icon">🔍</span>
+                        Back to Search
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Configuration Section -->
+            <div class="card">
+                <h3>⚙️ Evaluation Configuration</h3>
+                
+                <!-- Database Selection -->
+                <div class="option-group">
+                    <label for="databaseSelect">💾 Target Database:</label>
+                    <select id="databaseSelect" class="select-input">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+
+                <!-- Catalog Selection -->
+                <div class="option-group">
+                    <label for="catalogSelect">📚 Catalog:</label>
+                    <select id="catalogSelect" class="select-input">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+
+                <!-- Query Input Method -->
+                <div class="option-group">
+                    <label>📝 Query Input Method:</label>
+                    <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" name="inputMethod" value="manual" checked>
+                            <span>Manual Input</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" name="inputMethod" value="file">
+                            <span>Upload File (CSV/Excel)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Manual Input Section -->
+                <div id="manualInputSection" class="input-section">
+                    <label for="manualQueries">Enter queries (one per line):</label>
+                    <textarea 
+                        id="manualQueries" 
+                        placeholder="e.g., Show all customers from 2024&#10;List top 10 products by revenue"
+                        rows="5"
+                        style="width: 100%;"
+                    ></textarea>
+                    <div class="option-group">
+                        <label for="trueSqlInput">True SQL (optional, one per line, matching query order):</label>
+                        <textarea 
+                            id="trueSqlInput" 
+                            placeholder="e.g., SELECT * FROM customers WHERE year = 2024&#10;SELECT product_name, revenue FROM products ORDER BY revenue DESC LIMIT 10"
+                            rows="5"
+                            style="width: 100%;"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <!-- File Upload Section -->
+                <div id="fileUploadSection" class="input-section hidden">
+                    <div style="margin-bottom: 1rem;">
+                        <button id="downloadTemplateBtn" class="btn btn-secondary">
+                            <span class="icon">📥</span>
+                            Download Template (CSV)
+                        </button>
+                        <button id="downloadTemplateExcelBtn" class="btn btn-secondary">
+                            <span class="icon">📥</span>
+                            Download Template (Excel)
+                        </button>
+                    </div>
+                    
+                    <label for="fileInput">Upload CSV or Excel file:</label>
+                    <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" class="file-input">
+                    <div id="fileInfo" class="text-secondary" style="margin-top: 0.5rem;"></div>
+                </div>
+
+                <!-- Baseline Model Selection (when no true SQL) -->
+                <div id="baselineSection" class="option-group hidden">
+                    <label for="baselineModelSelect">🎯 Use model output as baseline (when true SQL not provided):</label>
+                    <select id="baselineModelSelect" class="select-input">
+                        <option value="">Select baseline model</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Model Selection Section -->
+            <div class="card">
+                <h3>🤖 Model Selection</h3>
+                <p class="text-secondary" style="margin-bottom: 1rem;">Select models to evaluate</p>
+                
+                <div class="model-selection-container">
+                    <!-- OpenAI Models -->
+                    <div class="model-group">
+                        <h4>OpenAI Models (Online)</h4>
+                        <div id="openaiModels" class="model-checkbox-group"></div>
+                    </div>
+
+                    <!-- OpenRouter Models -->
+                    <div class="model-group">
+                        <h4>OpenRouter Models (Online)</h4>
+                        <div id="openrouterModels" class="model-checkbox-group"></div>
+                    </div>
+
+                    <!-- Ollama Models -->
+                    <div class="model-group">
+                        <h4>Ollama Models (Offline)</h4>
+                        <div id="ollamaModels" class="model-checkbox-group"></div>
+                    </div>
+                </div>
+
+                <div class="option-group" style="margin-top: 1rem;">
+                    <label for="temperatureInput">🌡️ Temperature (for all models):</label>
+                    <input type="number" id="temperatureInput" class="number-input" value="0.3" min="0" max="2" step="0.1">
+                </div>
+
+                <div class="button-group" style="margin-top: 1.5rem;">
+                    <button id="testRequestBtn" class="btn btn-secondary">
+                        <span class="icon">🔧</span>
+                        Test Request (Debug)
+                    </button>
+                    <button id="runEvaluationBtn" class="btn btn-primary btn-large">
+                        <span class="icon">🚀</span>
+                        Generate Evaluation Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Section -->
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p id="loadingMessage">Processing evaluation...</p>
+                <p id="loadingProgress" class="text-secondary"></p>
+                <div id="progressDetails" class="progress-details" style="margin-top: 1rem; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;"></div>
+            </div>
+
+            <!-- Evaluation History Section -->
+            <div id="historySection" class="card">
+                <h3>📚 Evaluation History</h3>
+                <p class="text-secondary" style="margin-bottom: 1rem;">Load previous evaluation results</p>
+                <div id="historyList" class="history-list"></div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="card hidden">
+                <h3>📈 Evaluation Results</h3>
+                
+                <!-- Summary Table -->
+                <div class="table-container" style="margin-bottom: 2rem;">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>Provider</th>
+                                <th>Model</th>
+                                <th>Accuracy (%)</th>
+                                <th>Avg Speed</th>
+                                <th>Total Time</th>
+                                <th>Iterations</th>
+                                <th>Temperature</th>
+                                <th>Success Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Download Results -->
+                <div class="button-group" style="margin-bottom: 2rem;">
+                    <button id="downloadResultsBtn" class="btn btn-secondary">
+                        <span class="icon">📥</span>
+                        Download Results (CSV)
+                    </button>
+                    <button id="downloadDetailedBtn" class="btn btn-secondary">
+                        <span class="icon">📥</span>
+                        Download Detailed Report
+                    </button>
+                </div>
+
+                <!-- Visualizations -->
+                <div class="visualization-section">
+                    <h4>📊 Performance Comparison</h4>
+                    
+                    <!-- Grouped Bar Chart -->
+                    <div style="margin-bottom: 3rem;">
+                        <h5>Accuracy & Speed Comparison</h5>
+                        <canvas id="comparisonChart" style="max-height: 400px;"></canvas>
+                    </div>
+
+                    <!-- Separate Charts -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+                        <div>
+                            <h5>Accuracy by Model</h5>
+                            <canvas id="accuracyChart"></canvas>
+                        </div>
+                        <div>
+                            <h5>Average Speed by Model</h5>
+                            <canvas id="speedChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Heatmap -->
+                    <div style="margin-bottom: 2rem;">
+                        <h5>Performance Heatmap</h5>
+                        <canvas id="heatmapChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detailed Results -->
+                <div id="detailedResults" style="margin-top: 2rem;">
+                    <h4>🔍 Detailed Query Results</h4>
+                    <div id="detailedResultsContent"></div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Model Evaluation • Powered by Claude 4.5 Sonnet Judge</p>
+        </footer>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/evaluation.js"></script>
+</body>
+</html>
+

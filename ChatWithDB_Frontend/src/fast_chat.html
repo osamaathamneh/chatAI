@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Chat - Template-Enhanced SQL Generation</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .performance-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .badge-template {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .badge-pgai {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .template-info {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        
+        .template-info strong {
+            color: #5a67d8;
+        }
+        
+        .templates-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        .template-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f7fafc;
+            border-left: 3px solid #667eea;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .template-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+        
+        .template-query {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .template-sql {
+            font-size: 0.85em;
+            color: #718096;
+            font-family: 'Courier New', monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .speed-comparison {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 8px;
+        }
+        
+        .speed-stat {
+            text-align: center;
+        }
+        
+        .speed-stat .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .speed-stat .label {
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2em;
+        }
+        
+        .page-header p {
+            margin: 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .feature-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 15px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+        
+        .toggle-templates {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #cbd5e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #667eea;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            color: #764ba2;
+        }
+        
+        .feedback-section {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+        }
+        
+        .modal {
+            display: none;
+        }
+        
+        .modal.hidden {
+            display: none !important;
+        }
+        
+        .modal:not(.hidden) {
+            display: block;
+        }
+        
+        .modal-content {
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #38a169;
+        }
+        
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Main Chat</a>
+        
+        <div class="page-header">
+            <h1>⚡ Fast Chat</h1>
+            <p>Template-Enhanced SQL Generation for Common Queries</p>
+            <div style="margin-top: 15px;">
+                <span class="feature-tag">🚀 10x Faster</span>
+                <span class="feature-tag">🎯 Smart Matching</span>
+                <span class="feature-tag">🤖 LLM Option</span>
+                <span class="feature-tag">💰 Zero Cost</span>
+                <span class="feature-tag">📊 25+ Templates</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="toggle-templates">
+                <span style="color: #080808;font-weight: 600;">Use Template Matching:</span>
+                <div class="toggle-switch active" id="templateToggle"></div>
+                <span id="templateStatus" style="color: #667eea; font-weight: 600;">Enabled</span>
+            </div>
+
+            <div class="toggle-templates">
+                <span style="color: #080808;font-weight: 600;">LLM-Based Matching:</span>
+                <div class="toggle-switch active" id="llmMatchingToggle"></div>
+                <span id="llmMatchingStatus" style="color: #667eea; font-weight: 600;">Enabled (🤖 AI)</span>
+                <span style="font-size: 0.85em; color: #718096; margin-left: 10px;">(🤖 AI vs ⚡ Static)</span>
+            </div>
+
+            <div class="toggle-templates">
+                <span style="color: #080808;font-weight: 600;">Auto-Execute SQL:</span>
+                <div class="toggle-switch active" id="autoExecuteToggle"></div>
+                <span id="autoExecuteStatus" style="color: #667eea; font-weight: 600;">Enabled</span>
+            </div>
+
+            <div class="input-section">
+                <label for="query">Ask a question about your database:</label>
+                <textarea 
+                    id="query" 
+                    placeholder="e.g., Get all prepaid activations from 2025-07-31 to 2025-08-31"
+                    rows="3"
+                ></textarea>
+                
+                <div class="options-section">
+                    <div class="option-group">
+                        <label for="providerSelect">🌐 Provider:</label>
+                        <select id="providerSelect" class="select-input">
+                            <option value="openai">Online (OpenAI)</option>
+                            <option value="openrouter" selected>OpenRouter (Multi-Model)</option>
+                            <option value="ollama">Offline (Ollama)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="modelSelect">🤖 Model:</label>
+                        <select id="modelSelect" class="select-input">
+                            <option value="openai:gpt-5">GPT-5</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="databaseSelect">💾 Database:</label>
+                        <select id="databaseSelect" class="select-input">
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="catalogSelect">📚 Catalog:</label>
+                        <select id="catalogSelect" class="select-input">
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button id="generateBtn" class="btn btn-primary">⚡ Generate & Execute</button>
+                    <button id="executeBtn" class="btn btn-secondary" style="display:none;">▶️ Execute Again</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p id="loadingMessage">Processing...</p>
+            </div>
+        </div>
+
+        <!-- SQL Results -->
+        <div id="sqlResults" class="card result-card hidden">
+            <div class="result-header">
+                <h3>Generated SQL</h3>
+                <div id="performanceBadge"></div>
+            </div>
+            
+            <div id="templateInfo" class="template-info hidden"></div>
+            
+            <pre id="sqlContent" class="result-content"></pre>
+            
+            <!-- Feedback Section -->
+            <div id="feedbackSection" class="feedback-section" style="margin-top: 15px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <span style="font-weight: 600; color: #2d3748;">Was this SQL helpful?</span>
+                </div>
+                <div class="button-group" style="margin: 0;">
+                    <button id="likeBtn" class="btn btn-success" style="background: #48bb78; color: white;">
+                        👍 Like
+                    </button>
+                    <button id="dislikeBtn" class="btn btn-danger" style="background: #f56565; color: white;">
+                        👎 Dislike
+                    </button>
+                </div>
+                <div id="feedbackStatus" style="margin-top: 10px; font-size: 0.9em;"></div>
+            </div>
+            
+            <div class="button-group">
+                <button id="copyBtn" class="btn btn-secondary">📋 Copy</button>
+                <button id="clearSqlBtn" class="btn btn-secondary">🗑️ Clear</button>
+            </div>
+            
+            <div class="result-footer">
+                <span id="generationTime"></span>
+                <span id="tokenUsage"></span>
+            </div>
+        </div>
+        
+        <!-- Dislike Modal -->
+        <div id="dislikeModal" class="modal hidden" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+            <div class="modal-content" style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 800px; max-height: 80vh; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0;">Provide Correct SQL</h3>
+                    <button id="closeModalBtn" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2d3748;">Original Query:</label>
+                    <div id="modalUserQuery" style="padding: 10px; background: #f7fafc; border-radius: 4px; margin-bottom: 15px; color: #2d3748;"></div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2d3748;">Generated SQL (for reference):</label>
+                    <pre id="modalGeneratedSql" style="padding: 10px; background: #f7fafc; border-radius: 4px; overflow-x: auto; font-size: 0.9em; color: #2d3748;"></pre>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label for="correctSqlInput" style="display: block; margin-bottom: 5px; font-weight: 600;">Correct SQL:</label>
+                    <textarea id="correctSqlInput" rows="8" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9em;"></textarea>
+                </div>
+                <div style="margin-bottom: 15px; padding: 15px; background: #edf2f7; border-radius: 4px;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #2d3748;">🤖 Regenerate SQL with AI:</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div>
+                            <label for="modalProviderSelect" style="display: block; margin-bottom: 5px; font-size: 0.9em; color: #2d3748;">Provider:</label>
+                            <select id="modalProviderSelect" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px; color: #2d3748; background: white;">
+                                <option value="openrouter">OpenRouter</option>
+                                <option value="openai">OpenAI</option>
+                                <option value="ollama">Ollama</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="modalModelSelect" style="display: block; margin-bottom: 5px; font-size: 0.9em; color: #2d3748;">Model:</label>
+                            <select id="modalModelSelect" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px; color: #2d3748; background: white;">
+                                <option value="">Loading models...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="regenerateSqlBtn" class="btn btn-secondary" style="width: 100%;">🤖 Regenerate with AI</button>
+                </div>
+                <div class="button-group" style="margin-top: 20px;">
+                    <button id="submitFeedbackBtn" class="btn btn-primary">✅ Submit Feedback</button>
+                    <button id="cancelFeedbackBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Execution Results -->
+        <div id="executionResults" class="card result-card hidden">
+            <div class="result-header">
+                <h3>Query Results</h3>
+            </div>
+            <div id="executionContent" class="result-content"></div>
+            <div class="button-group">
+                <button id="clearExecutionBtn" class="btn btn-secondary">🗑️ Clear</button>
+            </div>
+        </div>
+
+        <!-- Available Templates -->
+        <div class="templates-section">
+            <h3>📋 Available Query Templates</h3>
+            <p style="color: #718096; margin-bottom: 15px;">
+                Click on any template to use it as your query. The system will automatically match similar queries.
+            </p>
+            <div id="templatesList">
+                Loading templates...
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/fast_chat.js"></script>
+</body>
+</html>
+
