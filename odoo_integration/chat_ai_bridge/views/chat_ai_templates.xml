@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="chat_ai_page" name="Chat AI">
+        <t t-call="web.layout">
+            <div class="o_chat_ai_bridge">
+                <div class="o_chat_ai_bridge__header">
+                    <h1>Chat AI</h1>
+                    <p class="text-muted">Ask a question and generate SQL from your Chat AI backend.</p>
+                </div>
+                <div class="o_chat_ai_bridge__body">
+                    <textarea class="o_chat_ai_bridge__prompt" placeholder="Ask a question about your data..."></textarea>
+                    <button class="btn btn-primary o_chat_ai_bridge__submit" type="button">Send</button>
+                    <div class="o_chat_ai_bridge__status text-muted" />
+                    <pre class="o_chat_ai_bridge__output" />
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
