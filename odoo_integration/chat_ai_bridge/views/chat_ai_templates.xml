@@ -10,8 +10,8 @@
                 <div class="o_chat_ai_bridge__body">
                     <textarea class="o_chat_ai_bridge__prompt" placeholder="Ask a question about your data..."></textarea>
                     <button class="btn btn-primary o_chat_ai_bridge__submit" type="button">Send</button>
-                    <div class="o_chat_ai_bridge__status text-muted" />
-                    <pre class="o_chat_ai_bridge__output" />
+                    <div class="o_chat_ai_bridge__status text-muted"></div>
+                    <pre class="o_chat_ai_bridge__output"></pre>
                 </div>
             </div>
         </t>
