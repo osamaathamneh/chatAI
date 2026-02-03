@@ -1,0 +1,13 @@
+fastapi==0.116.2
+uvicorn==0.35.0
+psycopg2-binary==2.9.10
+fastembed==0.7.3
+openai==1.108.0
+pydantic==2.11.9
+python-dotenv==1.1.1
+pgai[vectorizer-worker,semantic-catalog]==0.12.0
+faiss-cpu>=1.7.4
+dateparser
+# we have to uninstall pydantic-ai
+# !pip uninstall -y pydantic-ai
+# !pip install pydantic-ai==1.0.10

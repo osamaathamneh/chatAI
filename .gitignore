@@ -1,0 +1,95 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# FAISS vector stores
+*.faiss
+*.faiss.index
+
+# Generated YAML files
+*.yaml
+!requirements.yaml
+!*.example.yaml
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+query_history.db
+
+# Data directory - ignore all data files but keep structure
+# Templates directory
+data/templates/*.csv
+data/templates/*.faiss
+data/templates/*.faiss.index
+data/templates/template_vectors_metadata.json
+!data/templates/*.template
+!data/templates/.gitkeep
+
+# Catalog directory
+data/catalog/*.csv
+data/catalog/*.yaml
+data/catalog/yaml_chunks/
+data/catalog/pgai_chunks/
+!data/catalog/*.template
+!data/catalog/.gitkeep
+
+# Legacy paths (kept for backward compatibility)
+yaml_chunks/
+pgai_chunks/
+descriptions*.yaml
+template_vectors.faiss
+template_vectors_metadata.json
+SalesPoint3 - primary_tables.csv
+templates_with_prompt_fewshot.csv
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+diagrams/diagrams
